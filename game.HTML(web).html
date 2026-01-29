@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Square Dodger</title>
+    <style>
+        /* CSS: Styles the game area and characters */
+        body { text-align: center; font-family: Arial, sans-serif; background: #222; color: white; }
+        #gameCanvas { border: 2px solid white; background: #000; cursor: none; }
+        h1 { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Score: <span id="score">0</span></h1>
+    <!-- HTML: The canvas where the game is drawn -->
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
+
+    <script>
+        // JavaScript: The game logic
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const scoreElement = document.getElementById("score");
+
+        let score = 0;
+        let player = { x: 200, y: 450, size: 20, color: "lime" };
+        let enemy = { x: Math.random() * 380, y: 0, size: 20, speed: 5 };
+
+        // Track mouse movement to move the player
+        canvas.addEventListener("mousemove", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            player.x = e.clientX - rect.left - player.size / 2;
+        });
+
+        function update() {
+            // Move enemy down
+            enemy.y += enemy.speed;
+
+            // Reset enemy if it leaves screen
+            if (enemy.y > canvas.height) {
+                enemy.y = 0;
+                enemy.x = Math.random() * (canvas.width - enemy.size);
+                enemy.speed += 0.2; // Increase difficulty
+                score++;
+                scoreElement.innerText = score;
+            }
+
+            // Collision Detection
+            if (player.x < enemy.x + enemy.size &&
+                player.x + player.size > enemy.x &&
+                player.y < enemy.y + enemy.size &&
+                player.y + player.size > enemy.y) {
+                alert("Game Over! Score: " + score);
+                document.location.reload();
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear screen
+            
+            // Draw Player
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.size, player.size);
+
+            // Draw Enemy
+            ctx.fillStyle = "red";
+            ctx.fillRect(enemy.x, enemy.y, enemy.size, enemy.size);
+
+            update();
+            requestAnimationFrame(draw); // Create smooth animation loop
+        }
+
+        draw(); // Start the game
+    </script>
+</body>
+</html>
